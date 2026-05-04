@@ -15,7 +15,7 @@ let papersData = [];
 let unfilteredData = [];
 
 // 1. Load the Filtered CSV (Updated to version 6)
-fs.createReadStream('./data/papersdata_filtered_6.csv')
+fs.createReadStream('./data/papersdata_filtered_3.csv')
   .pipe(csv())
   .on('data', (data) => {
       if (data.level === 'Unknown') data.level = 'H2';

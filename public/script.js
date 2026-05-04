@@ -70,14 +70,22 @@ async function fetchRandomPage() {
         document.getElementById('paper-image').src = data.imageBuffer;
         document.getElementById('drive-link').href = data.driveLink;
 
-        // Reveal UI
+        // Reveal standard UI
         document.getElementById('loading-paper').style.display = 'none';
         document.getElementById('paper-image').style.display = 'block';
-        document.getElementById('drive-link').style.display = 'block';
+        document.getElementById('drive-link').style.display = 'flex';
         document.getElementById('next-btn').style.display = 'block';
+
+        // Reveal Answer Key button ONLY if a match was found in the unfiltered dataset
+        const answerBtn = document.getElementById('answer-link');
+        if (data.answerLink) {
+            answerBtn.href = data.answerLink;
+            answerBtn.style.display = 'flex';
+        } else {
+            answerBtn.style.display = 'none';
+        }
 
     } catch (error) {
         console.error(error);
         document.getElementById('loading-paper').innerText = 'Error loading paper. Try selecting different subjects.';
     }
-}

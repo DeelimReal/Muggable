@@ -1,52 +1,41 @@
-<!-- public/index.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Guess the Paper</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Muggable</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="game-container">
-        <h1>Guess the Paper</h1>
-        
-        <div class="game-board">
-            <!-- The Left Side: The Image (Cropped) -->
-            <div class="paper-container">
-                <div id="loading">Loading paper...</div>
-                <img id="paper-image" src="" alt="Exam Paper" style="display: none;">
+    <div class="app-container">
+        <!-- Header (Clickable Logo) -->
+        <header>
+            <h1 id="logo" title="Back to menu">Muggable</h1>
+            <p class="subtitle">idontknowwhattostudypleasehelpme</p>
+        </header>
+
+        <!-- Home Screen / Menu -->
+        <div id="home-screen">
+            <h2>Select Your Subjects</h2>
+            <p>Choose the categories you want to study. Leave blank to shuffle everything.</p>
+            <div id="filter-container" class="filter-grid">
+                <!-- Checkboxes injected by Javascript -->
+                <div id="loading-filters">Loading subjects...</div>
             </div>
+            <button id="start-btn" class="primary-btn">Start Mugging</button>
+        </div>
 
-            <!-- The Right Side: The Guessing Form -->
-            <div class="controls">
-                <div class="input-group">
-                    <label>Year:</label>
-                    <input type="number" id="guess-year" placeholder="e.g. 2022">
-                </div>
-                
-                <div class="input-group">
-                    <label>School (JC):</label>
-                    <input type="text" id="guess-school" placeholder="e.g. ACJC">
-                </div>
-
-                <div class="input-group">
-                    <label>Subject:</label>
-                    <input type="text" id="guess-subject" placeholder="e.g. Mathematics">
-                </div>
-
-                <div class="input-group">
-                    <label>Level:</label>
-                    <select id="guess-level">
-                        <option value="">Select Level</option>
-                        <option value="H1">H1</option>
-                        <option value="H2">H2</option>
-                        <option value="H3">H3</option>
-                    </select>
-                </div>
-
-                <button id="submit-btn">Submit Guess</button>
-                <div id="result"></div>
-                <button id="next-btn" style="display: none;">Next Paper</button>
+        <!-- Study Screen (Hidden by default) -->
+        <div id="study-screen" style="display: none;">
+            <h3 id="pdf-filename">Loading Paper...</h3>
+            
+            <div id="loading-paper">Extracting a random page... this takes a few seconds...</div>
+            
+            <img id="paper-image" src="" alt="Exam Paper Page" style="display: none;">
+            
+            <div class="actions">
+                <a id="drive-link" href="#" target="_blank" class="secondary-btn" style="display: none;">Open Full Paper in Google Drive</a>
+                <button id="next-btn" class="primary-btn" style="display: none;">Next Random Page</button>
             </div>
         </div>
     </div>

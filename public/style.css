@@ -78,15 +78,13 @@ header {
 
 /* Full Sized Image styling */
 #paper-image {
-    width: 100%;
-    max-width: 900px; /* Prevents it from becoming awkwardly large on ultra-wide screens */
-    height: auto;     /* Maintains natural aspect ratio */
-    object-fit: contain; /* Prevents squishing/stretching */
-    display: block;
-    border: 2px solid #ddd;
-    border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-    margin: 0 auto 20px auto;
+    width: 100%;       /* Fill the horizontal space */
+    max-width: 900px;  /* But don't get too giant */
+    height: auto;      /* CRITICAL: Keep original proportions */
+    display: block;    /* Remove bottom whitespace gaps */
+    object-fit: contain; /* Extra safety: fits image inside box without distortion */
+    margin: 0 auto 20px auto; 
+    border: 1px solid #ddd;
 }
 
 /* Buttons */

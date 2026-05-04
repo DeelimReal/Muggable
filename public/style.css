@@ -141,14 +141,14 @@ header {
 }
 .button-group {
     display: flex;
-    gap: 15px;
+    gap: 10px;
     justify-content: center;
-    flex-wrap: wrap; /* Allows buttons to stack on small mobile screens */
+    margin-bottom: 10px;
 }
 
 .answer-btn {
-    background-color: #2ecc71; /* Green color for the answer key */
-    color: white;
+    background-color: #27ae60 !important; /* Standout green for the answer key */
+    color: white !important;
 }
 
 .answer-btn:hover { background-color: #27ae60; color: white; }

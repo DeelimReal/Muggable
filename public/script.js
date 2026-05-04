@@ -1,70 +1,83 @@
-// public/script.js
-let currentAnswers = {};
-
-async function fetchNewPaper() {
-    document.getElementById('loading').style.display = 'block';
-    document.getElementById('paper-image').style.display = 'none';
-    document.getElementById('result').innerText = '';
-    document.getElementById('next-btn').style.display = 'none';
-    
-    // Clear inputs
-    document.getElementById('guess-year').value = '';
-    document.getElementById('guess-school').value = '';
-    document.getElementById('guess-subject').value = '';
-    document.getElementById('guess-level').value = '';
-
+// On page load, fetch available filters
+document.addEventListener("DOMContentLoaded", async () => {
     try {
-        const response = await fetch('/api/random-paper');
-        const data = await response.json();
+        const response = await fetch('/api/filters');
+        const filters = await response.json();
         
-        currentAnswers = data.answers;
-        
-        document.getElementById('paper-image').src = data.imageBuffer;
-        document.getElementById('paper-image').style.display = 'block';
-        document.getElementById('loading').style.display = 'none';
-        
+        const container = document.getElementById('filter-container');
+        container.innerHTML = ''; // clear loading text
+
+        // Create a checkbox for every Subject/Level combo
+        filters.forEach(combo => {
+            const label = document.createElement('label');
+            label.className = 'filter-item';
+            label.innerHTML = `<input type="checkbox" value="${combo}"> ${combo}`;
+            container.appendChild(label);
+        });
     } catch (error) {
-        console.error("Failed to load paper", error);
-        document.getElementById('loading').innerText = 'Error loading paper.';
+        document.getElementById('loading-filters').innerText = "Failed to load subjects. Please refresh.";
     }
-}
-
-document.getElementById('submit-btn').addEventListener('click', () => {
-    const guessYear = document.getElementById('guess-year').value;
-    const guessSchool = document.getElementById('guess-school').value.toUpperCase();
-    const guessSubject = document.getElementById('guess-subject').value;
-    const guessLevel = document.getElementById('guess-level').value;
-
-    let score = 0;
-    let feedback = [];
-
-    // Compare guesses (using loose matching for subjects)
-    if (guessYear == currentAnswers.year) score++;
-    else feedback.push(`Year was ${currentAnswers.year}`);
-
-    if (guessSchool == currentAnswers.school) score++;
-    else feedback.push(`School was ${currentAnswers.school}`);
-
-    if (guessLevel == currentAnswers.level) score++;
-    else feedback.push(`Level was ${currentAnswers.level}`);
-
-    // Simple includes check for subject as they can be long
-    if (guessSubject && currentAnswers.subject.toLowerCase().includes(guessSubject.toLowerCase())) score++;
-    else feedback.push(`Subject was ${currentAnswers.subject}`);
-
-    const resultDiv = document.getElementById('result');
-    if (score === 4) {
-        resultDiv.style.color = "green";
-        resultDiv.innerText = "Perfect! You got all 4 correct!";
-    } else {
-        resultDiv.style.color = "red";
-        resultDiv.innerText = `You scored ${score}/4.\nCorrections: ${feedback.join(', ')}`;
-    }
-
-    document.getElementById('next-btn').style.display = 'block';
 });
 
-document.getElementById('next-btn').addEventListener('click', fetchNewPaper);
+// Handle Navigation
+document.getElementById('logo').addEventListener('click', () => {
+    document.getElementById('study-screen').style.display = 'none';
+    document.getElementById('home-screen').style.display = 'block';
+    
+    // Hide paper elements to reset state
+    document.getElementById('paper-image').style.display = 'none';
+    document.getElementById('drive-link').style.display = 'none';
+    document.getElementById('next-btn').style.display = 'none';
+});
 
-// Load the first paper on start
-fetchNewPaper();
+document.getElementById('start-btn').addEventListener('click', () => {
+    document.getElementById('home-screen').style.display = 'none';
+    document.getElementById('study-screen').style.display = 'flex';
+    fetchRandomPage();
+});
+
+document.getElementById('next-btn').addEventListener('click', fetchRandomPage);
+
+async function fetchRandomPage() {
+    // Show Loading
+    document.getElementById('loading-paper').style.display = 'block';
+    document.getElementById('paper-image').style.display = 'none';
+    document.getElementById('drive-link').style.display = 'none';
+    document.getElementById('next-btn').style.display = 'none';
+    document.getElementById('pdf-filename').innerText = 'Selecting a random paper...';
+
+    // Gather selected checkboxes
+    const checkboxes = document.querySelectorAll('.filter-item input:checked');
+    const selectedCombos = Array.from(checkboxes).map(cb => cb.value);
+    
+    // Build the query URL (e.g. ?combos=H2 Mathematics,H1 Physics)
+    let url = '/api/random-paper';
+    if (selectedCombos.length > 0) {
+        url += `?combos=${encodeURIComponent(selectedCombos.join(','))}`;
+    }
+
+    try {
+        const response = await fetch(url);
+        
+        if (!response.ok) {
+            throw new Error("No papers found or server error.");
+        }
+
+        const data = await response.json();
+        
+        // Update UI with the new paper
+        document.getElementById('pdf-filename').innerText = data.filename;
+        document.getElementById('paper-image').src = data.imageBuffer;
+        document.getElementById('drive-link').href = data.driveLink;
+
+        // Reveal UI
+        document.getElementById('loading-paper').style.display = 'none';
+        document.getElementById('paper-image').style.display = 'block';
+        document.getElementById('drive-link').style.display = 'block';
+        document.getElementById('next-btn').style.display = 'block';
+
+    } catch (error) {
+        console.error(error);
+        document.getElementById('loading-paper').innerText = 'Error loading paper. Try selecting different subjects.';
+    }
+}

@@ -60,21 +60,32 @@ app.get('/api/filters', (req, res) => {
 function findAnswerKeyId(questionFilename, folderPath) {
     const qName = String(questionFilename).toLowerCase();
     
+    // Identify Paper 1, Paper 2, etc.
     let paperCode = null;
     const match = qName.match(/p\d/); 
     if (match) paperCode = match[0];
 
-    const answerKeyWords = ['answer', 'ans', 'solution', 'soln', 'skema', 'rubric'];
+    // Expanded keywords (added 'suggested', 'mark', 'scheme')
+    const answerKeyWords = ['answer', 'ans', 'solution', 'soln', 'skema', 'rubric', 'suggested', 'mark', 'scheme'];
 
     const possibleAnswers = unfilteredData.filter(row => {
-        if (row.full_path !== folderPath) return false; 
-        
         const fname = String(row.filename).toLowerCase();
+        
+        // 1. Must not be the same file
+        if (row.filename === questionFilename) return false;
+        
+        // 2. Must contain an "Answer" keyword
         const hasKeyword = answerKeyWords.some(w => fname.includes(w));
-        const isNotSameFile = row.filename !== questionFilename;
-        
-        if (!hasKeyword || !isNotSameFile) return false;
-        
+        if (!hasKeyword) return false;
+
+        // 3. Try to match by folder OR by filename similarity
+        // (Allows answers to be in a different folder if the filename is very similar)
+        const inSameFolder = row.full_path === folderPath;
+        const nameSimilarity = fname.includes(qName.split('.')[0]); 
+
+        if (!inSameFolder && !nameSimilarity) return false;
+
+        // 4. Match the Paper Code (P1, P2) if it exists
         if (paperCode && !fname.includes(paperCode)) return false;
         
         return true;
@@ -82,7 +93,6 @@ function findAnswerKeyId(questionFilename, folderPath) {
 
     return possibleAnswers.length > 0 ? possibleAnswers[0].file_id : null;
 }
-
 // ENDPOINT: Get a random paper
 app.get('/api/random-paper', async (req, res) => {
   if (papersData.length === 0) return res.status(500).send('Data not loaded yet');

@@ -84,8 +84,10 @@ app.get('/api/random-paper', async (req, res) => {
 
     // 2. Fetch Parent Folder ID
     const metaResponse = await drive.files.get({
-        fileId: fileId,
-        fields: 'parents' 
+    fileId: fileId,
+    fields: 'parents',
+    supportsAllDrives: true, // CRITICAL: Required for Shared Drives
+    includeItemsFromAllDrives: true // CRITICAL: Helps find files in team folders
     });
     
     const parents = metaResponse.data.parents;

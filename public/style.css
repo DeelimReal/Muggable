@@ -1,0 +1,75 @@
+/* public/style.css */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+    margin: 0;
+    padding: 20px;
+}
+
+.game-container {
+    max-width: 1000px;
+    margin: auto;
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.game-board {
+    display: flex;
+    gap: 20px;
+}
+
+/* THE MAGIC HAPPENS HERE: The Vertical 2/3rds Crop */
+.paper-container {
+    flex: 2;
+    height: 60vh; /* Fixed height for the viewing area */
+    overflow: hidden; /* Cuts off anything below 60vh */
+    border: 2px solid #ccc;
+    position: relative;
+    background: #eaeaea;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+}
+
+#paper-image {
+    width: 100%;
+    /* We don't restrict the height, so it flows down and gets cropped by overflow:hidden */
+    height: auto; 
+}
+
+/* Form Styling */
+.controls {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.input-group {
+    display: flex;
+    flex-direction: column;
+}
+
+input, select {
+    padding: 8px;
+    margin-top: 5px;
+}
+
+button {
+    padding: 10px;
+    background: #007bff;
+    color: white;
+    border: none;
+    cursor: pointer;
+}
+
+button:hover {
+    background: #0056b3;
+}
+
+#result {
+    font-weight: bold;
+    margin-top: 10px;
+}

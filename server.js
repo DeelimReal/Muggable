@@ -139,7 +139,7 @@ app.get('/api/random-paper', async (req, res) => {
       saveFilename: "temp",
       savePath: "/tmp",
       format: "jpg",
-      width: 1024        // Only set width; leave height out to preserve aspect ratio
+      width: 1000        // Only set width; leave height out to preserve aspect ratio
   };
     
     const convert = fromBuffer(pdfBuffer, options);

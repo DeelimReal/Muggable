@@ -62,12 +62,6 @@ header {
     transform: scale(1.2);
 }
 
-/* Study Area */
-#study-screen {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}
 
 #pdf-filename {
     color: #2c3e50;
@@ -76,15 +70,31 @@ header {
     margin-bottom: 20px;
 }
 
-/* Full Sized Image styling */
+/* Ensure the container doesn't restrict the image */
+#study-screen {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    min-height: 100vh; /* Allow it to grow as long as needed */
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+/* The Paper Image */
 #paper-image {
-    width: 100%;       /* Fill the horizontal space */
-    max-width: 900px;  /* But don't get too giant */
-    height: auto;      /* CRITICAL: Keep original proportions */
-    display: block;    /* Remove bottom whitespace gaps */
-    object-fit: contain; /* Extra safety: fits image inside box without distortion */
-    margin: 0 auto 20px auto; 
-    border: 1px solid #ddd;
+    width: 100%;
+    max-width: 900px;
+    /* This is the key: height must be auto and max-height must be unset */
+    height: auto !important; 
+    max-height: none !important;
+    
+    display: block;
+    margin: 0 auto 20px auto;
+    object-fit: contain;
+    border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    background-color: white;
 }
 
 /* Buttons */

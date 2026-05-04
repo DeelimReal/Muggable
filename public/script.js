@@ -89,3 +89,4 @@ async function fetchRandomPage() {
         console.error(error);
         document.getElementById('loading-paper').innerText = 'Error loading paper. Try selecting different subjects.';
     }
+}

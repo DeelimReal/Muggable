@@ -102,7 +102,6 @@ app.get('/api/random-paper', async (req, res) => {
   let filteredData = papersData;
   if (selectedCombos.length > 0) {
       filteredData = papersData.filter(row => {
-          // Check for capitalization
           const level = row.level || row.Level || row.LEVEL;
           const subject = row.subject || row.Subject || row.SUBJECT;
           const combo = `${level} ${subject}`;
@@ -118,13 +117,22 @@ app.get('/api/random-paper', async (req, res) => {
   const fileId = randomRow.file_id;
 
   try {
+    // 1. Fetch File Content (for conversion)
     const response = await drive.files.get(
       { fileId: fileId, alt: 'media' },
       { responseType: 'arraybuffer' }
     );
     const pdfBuffer = Buffer.from(response.data);
 
-    // Determine Random Page (> 1)
+    // 2. Fetch File Metadata (to get the parent folder)
+    const metaResponse = await drive.files.get({
+        fileId: fileId,
+        fields: 'parents'
+    });
+    const folderId = metaResponse.data.parents ? metaResponse.data.parents[0] : null;
+    const folderLink = folderId ? `https://drive.google.com/drive/folders/${folderId}` : null;
+
+    // 3. Determine Random Page
     const pdfDoc = await PDFDocument.load(pdfBuffer);
     const pageCount = pdfDoc.getPageCount();
     
@@ -133,28 +141,24 @@ app.get('/api/random-paper', async (req, res) => {
         randomPage = Math.floor(Math.random() * (pageCount - 1)) + 2; 
     }
 
-    // Convert Image
+    // 4. Convert Image
     const options = {
-      density: 120,      
+      density: 120,
       saveFilename: "temp",
-      savePath: "/tmp",
+      savePath: "/tmp", 
       format: "jpg",
-      width: 1000        // Only set width; leave height out to preserve aspect ratio
-  };
+      width: 1000 
+    };
     
     const convert = fromBuffer(pdfBuffer, options);
     const pageImage = await convert(randomPage, { responseType: "base64" });
     const cleanBase64 = pageImage.base64.replace(/(\r\n|\n|\r)/gm, "");
 
-    // Find matching Answer Key
-    const answerKeyId = findAnswerKeyId(randomRow.filename, randomRow.full_path);
-    const answerLink = answerKeyId ? `https://drive.google.com/file/d/${answerKeyId}/view` : null;
-
     res.json({
       imageBuffer: `data:image/jpeg;base64,${cleanBase64}`,
-      filename: `Page ${randomPage} of ${randomRow.filename}`, 
+      filename: `Page ${randomPage} of ${randomRow.filename}`,
       driveLink: `https://drive.google.com/file/d/${fileId}/view`,
-      answerLink: answerLink 
+      folderLink: folderLink // NEW: Providing the full folder link
     });
 
   } catch (error) {

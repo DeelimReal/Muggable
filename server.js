@@ -116,56 +116,25 @@ app.get('/api/random-paper', async (req, res) => {
   const randomRow = filteredData[Math.floor(Math.random() * filteredData.length)];
   const fileId = randomRow.file_id;
 
-  try {
-    // 1. Fetch File Content (for conversion)
-    const response = await drive.files.get(
-      { fileId: fileId, alt: 'media' },
-      { responseType: 'arraybuffer' }
-    );
-    const pdfBuffer = Buffer.from(response.data);
+  // Inside app.get('/api/random-paper'...)
+try {
+    // ... code to get pdfBuffer ...
 
-    // 2. Fetch File Metadata (to get the parent folder)
+    // Fetch Folder Metadata
     const metaResponse = await drive.files.get({
         fileId: fileId,
-        fields: 'parents'
+        fields: 'parents' // This MUST be exactly 'parents'
     });
-    const folderId = metaResponse.data.parents ? metaResponse.data.parents[0] : null;
+
+    const parents = metaResponse.data.parents;
+    const folderId = (parents && parents.length > 0) ? parents[0] : null;
     const folderLink = folderId ? `https://drive.google.com/drive/folders/${folderId}` : null;
 
-    // 3. Determine Random Page
-    const pdfDoc = await PDFDocument.load(pdfBuffer);
-    const pageCount = pdfDoc.getPageCount();
-    
-    let randomPage = 1;
-    if (pageCount > 1) {
-        randomPage = Math.floor(Math.random() * (pageCount - 1)) + 2; 
-    }
-
-    // 4. Convert Image
-    const options = {
-      density: 120,
-      saveFilename: "temp",
-      savePath: "/tmp", 
-      format: "jpg",
-      width: 1000 
-    };
-    
-    const convert = fromBuffer(pdfBuffer, options);
-    const pageImage = await convert(randomPage, { responseType: "base64" });
-    const cleanBase64 = pageImage.base64.replace(/(\r\n|\n|\r)/gm, "");
-
+    // ... rest of the code ...
     res.json({
-      imageBuffer: `data:image/jpeg;base64,${cleanBase64}`,
-      filename: `Page ${randomPage} of ${randomRow.filename}`,
-      driveLink: `https://drive.google.com/file/d/${fileId}/view`,
-      folderLink: folderLink // NEW: Providing the full folder link
+        imageBuffer: `data:image/jpeg;base64,${cleanBase64}`,
+        filename: `Page ${randomPage} of ${randomRow.filename}`,
+        driveLink: `https://drive.google.com/file/d/${fileId}/view`,
+        folderLink: folderLink // Ensure this is being sent!
     });
-
-  } catch (error) {
-    console.error("Error processing paper:", error.message || error);
-    res.status(500).json({ error: 'Failed to process document' });
-  }
-});
-
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+}

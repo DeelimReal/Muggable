@@ -39,54 +39,54 @@ document.getElementById('start-btn').addEventListener('click', () => {
 document.getElementById('next-btn').addEventListener('click', fetchRandomPage);
 
 async function fetchRandomPage() {
-    // Show Loading
-    document.getElementById('loading-paper').style.display = 'block';
-    document.getElementById('paper-image').style.display = 'none';
-    document.getElementById('drive-link').style.display = 'none';
-    document.getElementById('next-btn').style.display = 'none';
-    document.getElementById('pdf-filename').innerText = 'Selecting a random paper...';
+    // Show Loading[cite: 2]
+    document.getElementById('loading-paper').style.display = 'block';[cite: 2]
+    document.getElementById('paper-image').style.display = 'none';[cite: 2]
+    document.getElementById('drive-link').style.display = 'none';[cite: 2]
+    document.getElementById('next-btn').style.display = 'none';[cite: 2]
+    document.getElementById('pdf-filename').innerText = 'Selecting a random paper...';[cite: 2]
 
-    // Gather selected checkboxes
-    const checkboxes = document.querySelectorAll('.filter-item input:checked');
-    const selectedCombos = Array.from(checkboxes).map(cb => cb.value);
+    // Gather selected checkboxes[cite: 2]
+    const checkboxes = document.querySelectorAll('.filter-item input:checked');[cite: 2]
+    const selectedCombos = Array.from(checkboxes).map(cb => cb.value);[cite: 2]
     
-    // Build the query URL (e.g. ?combos=H2 Mathematics,H1 Physics)
-    let url = '/api/random-paper';
-    if (selectedCombos.length > 0) {
-        url += `?combos=${encodeURIComponent(selectedCombos.join(','))}`;
+    // Build the query URL (e.g. ?combos=H2 Mathematics,H1 Physics)[cite: 2]
+    let url = '/api/random-paper';[cite: 2]
+    if (selectedCombos.length > 0) {[cite: 2]
+        url += `?combos=${encodeURIComponent(selectedCombos.join(','))}`;[cite: 2]
     }
 
     try {
-        const response = await fetch(url);
+        const response = await fetch(url);[cite: 2]
         
         if (!response.ok) {
-            throw new Error("No papers found or server error.");
+            throw new Error("No papers found or server error.");[cite: 2]
         }
 
-        const data = await response.json();
+        const data = await response.json();[cite: 2]
         
-        // Update UI with the new paper
-        document.getElementById('pdf-filename').innerText = data.filename;
-        document.getElementById('paper-image').src = data.imageBuffer;
-        document.getElementById('drive-link').href = data.driveLink;
+        // Update UI with the new paper[cite: 2]
+        document.getElementById('pdf-filename').innerText = data.filename;[cite: 2]
+        document.getElementById('paper-image').src = data.imageBuffer;[cite: 2]
+        document.getElementById('drive-link').href = data.driveLink;[cite: 2]
 
-        // Reveal standard UI
-        document.getElementById('loading-paper').style.display = 'none';
-        document.getElementById('paper-image').style.display = 'block';
-        document.getElementById('drive-link').style.display = 'flex';
-        document.getElementById('next-btn').style.display = 'block';
+        // Reveal standard UI elements[cite: 2]
+        document.getElementById('loading-paper').style.display = 'none';[cite: 2]
+        document.getElementById('paper-image').style.display = 'block';[cite: 2]
+        document.getElementById('drive-link').style.display = 'flex';[cite: 2]
+        document.getElementById('next-btn').style.display = 'block';[cite: 2]
 
-        // Reveal Answer Key button ONLY if a match was found in the unfiltered dataset
-        const answerBtn = document.getElementById('answer-link');
-        if (data.answerLink) {
-            answerBtn.href = data.answerLink;
-            answerBtn.style.display = 'flex';
+        // Handle the Full Folder Button
+        const folderBtn = document.getElementById('folder-link');
+        if (data.folderLink) {
+            folderBtn.href = data.folderLink;
+            folderBtn.style.display = 'flex';
         } else {
-            answerBtn.style.display = 'none';
+            folderBtn.style.display = 'none';
         }
 
     } catch (error) {
-        console.error(error);
-        document.getElementById('loading-paper').innerText = 'Error loading paper. Try selecting different subjects.';
+        console.error(error);[cite: 2]
+        document.getElementById('loading-paper').innerText = 'Error loading paper. Try selecting different subjects.';[cite: 2]
     }
 }

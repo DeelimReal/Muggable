@@ -91,6 +91,11 @@ app.get('/api/random-paper', async (req, res) => {
     });
     
     const parents = metaResponse.data.parents;
+    console.log("Found parents for file:", parents); // Add this line to your terminal logs to debug!
+    
+    const folderId = (parents && parents.length > 0) ? parents[0] : null;
+    const folderLink = folderId ? `https://drive.google.com/drive/folders/${folderId}` : null;
+    const parents = metaResponse.data.parents;
     const folderId = (parents && parents.length > 0) ? parents[0] : null;
     const folderLink = folderId ? `https://drive.google.com/drive/folders/${folderId}` : null;
 

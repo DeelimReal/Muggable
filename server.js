@@ -14,18 +14,17 @@ app.use(express.static('public'));
 let papersData = [];
 let unfilteredData = [];
 
-// 1. Load the Filtered CSV and convert 'Unknown' to 'H2'
-fs.createReadStream('./data/papersdata_filtered_3.csv')
+// 1. Load the Filtered CSV (Updated to version 6)
+fs.createReadStream('./data/papersdata_filtered_6.csv')
   .pipe(csv())
   .on('data', (data) => {
-      // Handle capitalized CSV columns
       if (data.level === 'Unknown') data.level = 'H2';
       if (data.Level === 'Unknown') data.Level = 'H2';
       papersData.push(data);
   })
   .on('end', () => console.log('Filtered CSV data loaded.'));
 
-// 2. Load the Unfiltered CSV (for finding answer keys)
+// 2. Load the Unfiltered CSV
 fs.createReadStream('./data/papersdata_unfiltered_2.csv')
   .pipe(csv())
   .on('data', (data) => unfilteredData.push(data))
@@ -43,57 +42,16 @@ const auth = new google.auth.JWT(
 );
 const drive = google.drive({ version: 'v3', auth });
 
-// ENDPOINT: Get filters (Handles uppercase and lowercase)
 app.get('/api/filters', (req, res) => {
     const combos = [...new Set(papersData.map(p => {
         const level = p.level || p.Level || p.LEVEL;
         const subject = p.subject || p.Subject || p.SUBJECT;
         return `${level} ${subject}`;
     }))].sort();
-    
-    // Filter out rows with missing data
     const cleanCombos = combos.filter(c => !c.includes('undefined'));
     res.json(cleanCombos);
 });
 
-// SMART MATCHER: Finds the answer key for a given paper
-function findAnswerKeyId(questionFilename, folderPath) {
-    const qName = String(questionFilename).toLowerCase();
-    
-    // Identify Paper 1, Paper 2, etc.
-    let paperCode = null;
-    const match = qName.match(/p\d/); 
-    if (match) paperCode = match[0];
-
-    // Expanded keywords (added 'suggested', 'mark', 'scheme')
-    const answerKeyWords = ['answer', 'ans', 'solution', 'soln', 'skema', 'rubric', 'suggested', 'mark', 'scheme'];
-
-    const possibleAnswers = unfilteredData.filter(row => {
-        const fname = String(row.filename).toLowerCase();
-        
-        // 1. Must not be the same file
-        if (row.filename === questionFilename) return false;
-        
-        // 2. Must contain an "Answer" keyword
-        const hasKeyword = answerKeyWords.some(w => fname.includes(w));
-        if (!hasKeyword) return false;
-
-        // 3. Try to match by folder OR by filename similarity
-        // (Allows answers to be in a different folder if the filename is very similar)
-        const inSameFolder = row.full_path === folderPath;
-        const nameSimilarity = fname.includes(qName.split('.')[0]); 
-
-        if (!inSameFolder && !nameSimilarity) return false;
-
-        // 4. Match the Paper Code (P1, P2) if it exists
-        if (paperCode && !fname.includes(paperCode)) return false;
-        
-        return true;
-    });
-
-    return possibleAnswers.length > 0 ? possibleAnswers[0].file_id : null;
-}
-// ENDPOINT: Get a random paper
 app.get('/api/random-paper', async (req, res) => {
   if (papersData.length === 0) return res.status(500).send('Data not loaded yet');
 
@@ -116,25 +74,57 @@ app.get('/api/random-paper', async (req, res) => {
   const randomRow = filteredData[Math.floor(Math.random() * filteredData.length)];
   const fileId = randomRow.file_id;
 
-  // Inside app.get('/api/random-paper'...)
-try {
-    // ... code to get pdfBuffer ...
+  try {
+    // 1. Fetch File Content
+    const response = await drive.files.get(
+      { fileId: fileId, alt: 'media' },
+      { responseType: 'arraybuffer' }
+    );
+    const pdfBuffer = Buffer.from(response.data);
 
-    // Fetch Folder Metadata
+    // 2. Fetch Parent Folder ID
     const metaResponse = await drive.files.get({
         fileId: fileId,
-        fields: 'parents' // This MUST be exactly 'parents'
+        fields: 'parents' 
     });
-
+    
     const parents = metaResponse.data.parents;
     const folderId = (parents && parents.length > 0) ? parents[0] : null;
     const folderLink = folderId ? `https://drive.google.com/drive/folders/${folderId}` : null;
 
-    // ... rest of the code ...
+    // 3. Determine Random Page
+    const pdfDoc = await PDFDocument.load(pdfBuffer);
+    const pageCount = pdfDoc.getPageCount();
+    let randomPage = 1;
+    if (pageCount > 1) {
+        randomPage = Math.floor(Math.random() * (pageCount - 1)) + 2; 
+    }
+
+    // 4. Convert Image
+    const options = {
+      density: 120,
+      saveFilename: "temp",
+      savePath: "/tmp", 
+      format: "jpg",
+      width: 1000 
+    };
+    
+    const convert = fromBuffer(pdfBuffer, options);
+    const pageImage = await convert(randomPage, { responseType: "base64" });
+    const cleanBase64 = pageImage.base64.replace(/(\r\n|\n|\r)/gm, "");
+
     res.json({
-        imageBuffer: `data:image/jpeg;base64,${cleanBase64}`,
-        filename: `Page ${randomPage} of ${randomRow.filename}`,
-        driveLink: `https://drive.google.com/file/d/${fileId}/view`,
-        folderLink: folderLink // Ensure this is being sent!
+      imageBuffer: `data:image/jpeg;base64,${cleanBase64}`,
+      filename: `Page ${randomPage} of ${randomRow.filename}`,
+      driveLink: `https://drive.google.com/file/d/${fileId}/view`,
+      folderLink: folderLink 
     });
-}
+
+  } catch (error) {
+    console.error("Error processing paper:", error.message || error);
+    res.status(500).json({ error: 'Failed to process document' });
+  }
+});
+
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`));

@@ -1,3 +1,4 @@
+/* General Page Styling */
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     background-color: #f7f9fc;
@@ -40,7 +41,7 @@ header {
     margin-top: 5px;
 }
 
-/* Checkbox Grid */
+/* Subject Selection Grid */
 .filter-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
@@ -55,6 +56,11 @@ header {
     padding: 10px;
     border-radius: 6px;
     cursor: pointer;
+    transition: background 0.2s;
+}
+
+.filter-item:hover {
+    background: #e1e8f0;
 }
 
 .filter-item input {
@@ -62,6 +68,16 @@ header {
     transform: scale(1.2);
 }
 
+/* Study Screen Layout */
+#study-screen {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    min-height: 100vh;
+    padding: 10px;
+    box-sizing: border-box;
+}
 
 #pdf-filename {
     color: #2c3e50;
@@ -70,25 +86,12 @@ header {
     margin-bottom: 20px;
 }
 
-/* Ensure the container doesn't restrict the image */
-#study-screen {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    width: 100%;
-    min-height: 100vh; /* Allow it to grow as long as needed */
-    padding: 20px;
-    box-sizing: border-box;
-}
-
-/* The Paper Image */
+/* The Paper Image - FIX: Prevents squashing */
 #paper-image {
     width: 100%;
     max-width: 900px;
-    /* This is the key: height must be auto and max-height must be unset */
     height: auto !important; 
     max-height: none !important;
-    
     display: block;
     margin: 0 auto 20px auto;
     object-fit: contain;
@@ -97,64 +100,75 @@ header {
     background-color: white;
 }
 
-/* Buttons */
-.actions {
-    display: flex;
-    flex-direction: column; /* Stack buttons vertically for better layout */
-    align-items: center;
-    gap: 15px;
-    width: 100%;
+/* Loading Indicators */
+#loading-filters {
+    grid-column: 1 / -1;
+    text-align: center;
+    color: #7f8c8d;
 }
-
-.primary-btn {
-    background-color: #3498db;
-    color: white;
-    border: none;
-    padding: 12px 24px;
-    font-size: 1.1rem;
-    border-radius: 6px;
-    cursor: pointer;
-    font-weight: bold;
-}
-
-.primary-btn:hover { background-color: #2980b9; }
-
-.secondary-btn {
-    background-color: #ecf0f1;
-    color: #2c3e50;
-    text-decoration: none;
-    padding: 12px 24px;
-    font-size: 1.1rem;
-    border-radius: 6px;
-    font-weight: bold;
-    display: flex;
-    align-items: center;
-}
-
-.secondary-btn:hover { background-color: #bdc3c7; }
 
 #loading-paper {
     font-size: 1.2rem;
     color: #e67e22;
     font-weight: bold;
     margin: 40px 0;
+    text-align: center;
 }
+
+/* Button & Action Areas */
+.actions {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+    width: 100%;
+    margin-top: 20px;
+}
+
 .button-group {
     display: flex;
     gap: 10px;
     justify-content: center;
-    margin-bottom: 10px;
+    flex-wrap: wrap; /* Allows buttons to stack on small mobile screens */
 }
 
-.answer-btn {
-    background-color: #27ae60 !important; /* Standout green for the answer key */
-    color: white !important;
+/* Button Styles */
+.primary-btn {
+    background-color: #3498db;
+    color: white;
+    border: none;
+    padding: 14px 28px;
+    font-size: 1.1rem;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background 0.2s;
 }
 
-.answer-btn:hover { background-color: #27ae60; color: white; }
+.primary-btn:hover {
+    background-color: #2980b9;
+}
 
+.secondary-btn {
+    background-color: #ecf0f1;
+    color: #2c3e50;
+    text-decoration: none;
+    padding: 12px 24px;
+    font-size: 1rem;
+    border-radius: 6px;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    transition: background 0.2s;
+}
+
+.secondary-btn:hover {
+    background-color: #bdc3c7;
+}
+
+/* Specific Folder Button Color */
 .folder-btn {
-    background-color: #f39c12 !important; /* A bright orange for folder access */
+    background-color: #f39c12 !important;
     color: white !important;
 }
 

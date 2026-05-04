@@ -1,0 +1,55 @@
+<!-- public/index.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Guess the Paper</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="game-container">
+        <h1>Guess the Paper</h1>
+        
+        <div class="game-board">
+            <!-- The Left Side: The Image (Cropped) -->
+            <div class="paper-container">
+                <div id="loading">Loading paper...</div>
+                <img id="paper-image" src="" alt="Exam Paper" style="display: none;">
+            </div>
+
+            <!-- The Right Side: The Guessing Form -->
+            <div class="controls">
+                <div class="input-group">
+                    <label>Year:</label>
+                    <input type="number" id="guess-year" placeholder="e.g. 2022">
+                </div>
+                
+                <div class="input-group">
+                    <label>School (JC):</label>
+                    <input type="text" id="guess-school" placeholder="e.g. ACJC">
+                </div>
+
+                <div class="input-group">
+                    <label>Subject:</label>
+                    <input type="text" id="guess-subject" placeholder="e.g. Mathematics">
+                </div>
+
+                <div class="input-group">
+                    <label>Level:</label>
+                    <select id="guess-level">
+                        <option value="">Select Level</option>
+                        <option value="H1">H1</option>
+                        <option value="H2">H2</option>
+                        <option value="H3">H3</option>
+                    </select>
+                </div>
+
+                <button id="submit-btn">Submit Guess</button>
+                <div id="result"></div>
+                <button id="next-btn" style="display: none;">Next Paper</button>
+            </div>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>

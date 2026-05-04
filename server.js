@@ -5,7 +5,7 @@ const cors = require('cors');
 const fs = require('fs');
 const csv = require('csv-parser');
 const { google } = require('googleapis');
-const { fromBuffer } = require('pdf2-pic');
+const { fromBuffer } = require('pdf2pic');
 
 const app = express();
 app.use(cors());

@@ -125,12 +125,12 @@ app.get('/api/random-paper', async (req, res) => {
 
     // Convert Image
     const options = {
-      density: 120,
+      density: 120,      
       saveFilename: "temp",
-      savePath: "/tmp", 
+      savePath: "/tmp",
       format: "jpg",
-      width: 1000 
-    };
+      width: 1024        // Only set width; leave height out to preserve aspect ratio
+  };
     
     const convert = fromBuffer(pdfBuffer, options);
     const pageImage = await convert(randomPage, { responseType: "base64" });

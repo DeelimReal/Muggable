@@ -1,75 +1,129 @@
-/* public/style.css */
 body {
-    font-family: Arial, sans-serif;
-    background-color: #f4f4f4;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f7f9fc;
     margin: 0;
     padding: 20px;
+    color: #333;
 }
 
-.game-container {
-    max-width: 1000px;
-    margin: auto;
+.app-container {
+    max-width: 900px;
+    margin: 0 auto;
     background: white;
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 8px 16px rgba(0,0,0,0.05);
 }
 
-.game-board {
-    display: flex;
-    gap: 20px;
+header {
+    text-align: center;
+    margin-bottom: 40px;
+    border-bottom: 2px solid #eee;
+    padding-bottom: 20px;
 }
 
-/* THE MAGIC HAPPENS HERE: The Vertical 2/3rds Crop */
-.paper-container {
-    flex: 2;
-    height: 60vh; /* Fixed height for the viewing area */
-    overflow: hidden; /* Cuts off anything below 60vh */
-    border: 2px solid #ccc;
-    position: relative;
-    background: #eaeaea;
-    display: flex;
-    justify-content: center;
-    align-items: flex-start;
+#logo {
+    font-size: 3rem;
+    color: #2c3e50;
+    margin: 0;
+    cursor: pointer;
+    transition: color 0.2s;
 }
 
-#paper-image {
-    width: 100%;
-    /* We don't restrict the height, so it flows down and gets cropped by overflow:hidden */
-    height: auto; 
+#logo:hover {
+    color: #3498db;
 }
 
-/* Form Styling */
-.controls {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-}
-
-.input-group {
-    display: flex;
-    flex-direction: column;
-}
-
-input, select {
-    padding: 8px;
+.subtitle {
+    font-style: italic;
+    color: #7f8c8d;
     margin-top: 5px;
 }
 
-button {
+/* Checkbox Grid */
+.filter-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 15px;
+    margin-bottom: 30px;
+}
+
+.filter-item {
+    display: flex;
+    align-items: center;
+    background: #f1f4f8;
     padding: 10px;
-    background: #007bff;
-    color: white;
-    border: none;
+    border-radius: 6px;
     cursor: pointer;
 }
 
-button:hover {
-    background: #0056b3;
+.filter-item input {
+    margin-right: 10px;
+    transform: scale(1.2);
 }
 
-#result {
+/* Study Area */
+#study-screen {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+#pdf-filename {
+    color: #2c3e50;
+    word-break: break-all;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+/* Full Sized Image styling */
+#paper-image {
+    width: 100%;
+    height: auto;
+    border: 2px solid #ddd;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    margin-bottom: 20px;
+}
+
+/* Buttons */
+.actions {
+    display: flex;
+    gap: 20px;
+    width: 100%;
+    justify-content: center;
+}
+
+.primary-btn {
+    background-color: #3498db;
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    font-size: 1.1rem;
+    border-radius: 6px;
+    cursor: pointer;
     font-weight: bold;
-    margin-top: 10px;
+}
+
+.primary-btn:hover { background-color: #2980b9; }
+
+.secondary-btn {
+    background-color: #ecf0f1;
+    color: #2c3e50;
+    text-decoration: none;
+    padding: 12px 24px;
+    font-size: 1.1rem;
+    border-radius: 6px;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+}
+
+.secondary-btn:hover { background-color: #bdc3c7; }
+
+#loading-paper {
+    font-size: 1.2rem;
+    color: #e67e22;
+    font-weight: bold;
+    margin: 40px 0;
 }

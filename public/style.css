@@ -79,19 +79,23 @@ header {
 /* Full Sized Image styling */
 #paper-image {
     width: 100%;
-    height: auto;
+    max-width: 900px; /* Prevents it from becoming awkwardly large on ultra-wide screens */
+    height: auto;     /* Maintains natural aspect ratio */
+    object-fit: contain; /* Prevents squishing/stretching */
+    display: block;
     border: 2px solid #ddd;
     border-radius: 8px;
     box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-    margin-bottom: 20px;
+    margin: 0 auto 20px auto;
 }
 
 /* Buttons */
 .actions {
     display: flex;
-    gap: 20px;
+    flex-direction: column; /* Stack buttons vertically for better layout */
+    align-items: center;
+    gap: 15px;
     width: 100%;
-    justify-content: center;
 }
 
 .primary-btn {
@@ -127,3 +131,16 @@ header {
     font-weight: bold;
     margin: 40px 0;
 }
+.button-group {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    flex-wrap: wrap; /* Allows buttons to stack on small mobile screens */
+}
+
+.answer-btn {
+    background-color: #2ecc71; /* Green color for the answer key */
+    color: white;
+}
+
+.answer-btn:hover { background-color: #27ae60; color: white; }

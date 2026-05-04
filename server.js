@@ -1,48 +1,11 @@
-require('dotenv').config();
-const express = require('express');
-const cors = require('cors');
-const fs = require('fs');
-const csv = require('csv-parser');
-const { google } = require('googleapis');
-const { fromBuffer } = require('pdf2pic');
-const { PDFDocument } = require('pdf-lib'); // NEW: For getting page counts
-
-const app = express();
-app.use(cors());
-app.use(express.static('public'));
-
-let papersData = [];
-let unfilteredData = [];
-
-// 1. Load the Filtered CSV and convert 'Unknown' to 'H2'
-fs.createReadStream('./data/papersdata_filtered_3.csv')
-  .pipe(csv())
-  .on('data', (data) => {
-      if (data.level === 'Unknown') data.level = 'H2';
-      papersData.push(data);
-  })
-  .on('end', () => console.log('Filtered CSV data loaded.'));
-
-// 2. Load the Unfiltered CSV (for finding answer keys)
-fs.createReadStream('./data/papersdata_unfiltered_2.csv')
-  .pipe(csv())
-  .on('data', (data) => unfilteredData.push(data))
-  .on('end', () => console.log('Unfiltered CSV data loaded.'));
-
-// Setup Google Drive Auth
-let privateKey = process.env.GOOGLE_PRIVATE_KEY || '';
-privateKey = privateKey.replace(/"/g, '').replace(/\\n/g, '\n');
-
-const auth = new google.auth.JWT(
-  process.env.GOOGLE_CLIENT_EMAIL,
-  null,
-  privateKey,
-  ['https://www.googleapis.com/auth/drive.readonly']
-);
-const drive = google.drive({ version: 'v3', auth });
-
 app.get('/api/filters', (req, res) => {
-    const combos = [...new Set(papersData.map(p => `${p.level} ${p.subject}`))].sort();
+    const combos = [...new Set(papersData.map(p => {
+        const level = p.level || p.Level || p.LEVEL;
+        const subject = p.subject || p.Subject || p.SUBJECT;
+        return `${level} ${subject}`;
+    }))].sort();
+    
+    // Filter out rows with missing data
     const cleanCombos = combos.filter(c => !c.includes('undefined'));
     res.json(cleanCombos);
 });
@@ -76,6 +39,7 @@ function findAnswerKeyId(questionFilename, folderPath) {
     return possibleAnswers.length > 0 ? possibleAnswers[0].file_id : null;
 }
 
+// UPDATED ENDPOINT: Get a random paper
 app.get('/api/random-paper', async (req, res) => {
   if (papersData.length === 0) return res.status(500).send('Data not loaded yet');
 
@@ -84,7 +48,10 @@ app.get('/api/random-paper', async (req, res) => {
   let filteredData = papersData;
   if (selectedCombos.length > 0) {
       filteredData = papersData.filter(row => {
-          const combo = `${row.level} ${row.subject}`;
+          // Check for capitalization
+          const level = row.level || row.Level || row.LEVEL;
+          const subject = row.subject || row.Subject || row.SUBJECT;
+          const combo = `${level} ${subject}`;
           return selectedCombos.includes(combo);
       });
   }
@@ -142,6 +109,3 @@ app.get('/api/random-paper', async (req, res) => {
     res.status(500).json({ error: 'Failed to process document' });
   }
 });
-
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));

@@ -14,7 +14,7 @@ app.use(express.static('public'));
 let papersData = [];
 let unfilteredData = [];
 
-// 1. Load the Filtered CSV (Updated to version 6)
+// 1. Load the Filtered CSV
 fs.createReadStream('./data/papersdata_filtered_3.csv')
   .pipe(csv())
   .on('data', (data) => {
@@ -82,19 +82,15 @@ app.get('/api/random-paper', async (req, res) => {
     );
     const pdfBuffer = Buffer.from(response.data);
 
-    // 2. Fetch Parent Folder ID
+    // 2. Fetch Parent Folder ID (FIXED: Duplicate declarations removed)
     const metaResponse = await drive.files.get({
-    fileId: fileId,
-    fields: 'parents',
-    supportsAllDrives: true, // CRITICAL: Required for Shared Drives
-    includeItemsFromAllDrives: true // CRITICAL: Helps find files in team folders
+        fileId: fileId,
+        fields: 'parents',
+        supportsAllDrives: true,
+        includeItemsFromAllDrives: true 
     });
     
     const parents = metaResponse.data.parents;
-    console.log("Found parents for file:", parents); // Add this line to your terminal logs to debug!
-    
-    const folderId = (parents && parents.length > 0) ? parents[0] : null;
-    const folderLink = folderId ? `https://drive.google.com/drive/folders/${folderId}` : null;
     const folderId = (parents && parents.length > 0) ? parents[0] : null;
     const folderLink = folderId ? `https://drive.google.com/drive/folders/${folderId}` : null;
 

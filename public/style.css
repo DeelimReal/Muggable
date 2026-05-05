@@ -89,8 +89,8 @@ header {
 /* The Paper Image - FIX: Prevents squashing */
 #paper-image {
     width: 100%;
-    max-width: 1240px;
-    height: 1754px; 
+    max-width: 900px;
+    height: 1273px; 
     max-height: none !important;
     display: block;
     margin: 0 auto 20px auto;
